@@ -3,6 +3,7 @@ package practice.project.siskoapi.model.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import practice.project.siskoapi.model.entity.FakultasEntity;
 
 @Data
 @NoArgsConstructor

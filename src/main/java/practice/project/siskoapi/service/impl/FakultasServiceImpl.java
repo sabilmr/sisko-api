@@ -1,6 +1,7 @@
 package practice.project.siskoapi.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import practice.project.siskoapi.model.entity.FakultasEntity;
@@ -13,6 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FakultasServiceImpl implements FakultasService {
     private final FakultasRepo repo;
@@ -30,31 +32,82 @@ public class FakultasServiceImpl implements FakultasService {
 
     @Override
     public Optional<FakultasRes> getById(String id) {
-        return Optional.empty();
+        FakultasEntity entity = repo.findById(id).orElse(null);
+        if (entity == null) {
+            return Optional.empty();
+        }
+        return Optional.of(convertEntityToRes(entity));
     }
 
     @Override
     public Optional<FakultasRes> save(FakultasReq request) {
-        return Optional.empty();
+        FakultasEntity result = new FakultasEntity();
+
+        BeanUtils.copyProperties(request, result);
+        result.setId(UUID.randomUUID().toString());
+        try {
+            repo.save(result);
+            log.info("Save fakultas success");
+            return Optional.of(this.convertEntityToRes(result));
+        }catch (Exception e) {
+            log.error("Save fakultas failed, error : {}", e.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<FakultasRes> update(FakultasReq request, String id) {
-        return Optional.empty();
+        FakultasEntity entity = this.repo.findById(id).orElse(null);
+        if (entity == null) {
+            return Optional.empty();
+        }
+
+        convertReqToEntity(request, entity);
+        entity.setId(id);
+        try {
+            repo.save(entity);
+            log.info("Update fakultas success");
+            return Optional.of(this.convertEntityToRes(entity));
+        } catch (Exception e) {
+            log.error("Update fakultas failed, error : {}", e.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<FakultasRes> delete(String id) {
-        return Optional.empty();
+        FakultasEntity entity = this.repo.findById(id).orElse(null);
+        if (entity == null) {
+            return Optional.empty();
+        }
+        try {
+            repo.delete(entity);
+            log.info("Delete fakultas success");
+            return Optional.of(this.convertEntityToRes(entity));
+        }catch (Exception e) {
+            log.error("Delete fakultas failed, error : {}", e.getMessage());
+            return Optional.empty();
+        }
     }
 
     private FakultasRes convertEntityToRes(FakultasEntity entity) {
         FakultasRes res = new FakultasRes();
 
         BeanUtils.copyProperties(entity, res);
-        res.setId(UUID.randomUUID().toString());
-
         return res;
+    }
 
+    private FakultasEntity convertReqToEntity(FakultasReq request) {
+        FakultasEntity entity = repo.findById(request.getId()).orElse(null);
+        if (entity == null) {
+            return null;
+        }
+
+        BeanUtils.copyProperties(request, entity);
+        return entity;
+    }
+
+    private void convertReqToEntity(FakultasReq request, FakultasEntity entity) {
+        BeanUtils.copyProperties(request, entity);
     }
 }
