@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import practice.project.siskoapi.model.entity.FakultasEntity;
+import practice.project.siskoapi.model.entity.JurusanEntity;
 import practice.project.siskoapi.model.request.FakultasReq;
 import practice.project.siskoapi.model.response.FakultasRes;
+import practice.project.siskoapi.model.response.JurusanRes;
 import practice.project.siskoapi.repository.FakultasRepo;
 import practice.project.siskoapi.service.FakultasService;
 
@@ -94,7 +96,21 @@ public class FakultasServiceImpl implements FakultasService {
         FakultasRes res = new FakultasRes();
 
         BeanUtils.copyProperties(entity, res);
+        if (!entity.getJurusan().isEmpty()) {
+            List<JurusanRes> jurusan = new ArrayList<>();
+            for (JurusanEntity majorsEntity : entity.getJurusan()) {
+                JurusanRes result = new JurusanRes();
+
+                BeanUtils.copyProperties(majorsEntity, result);
+                result.setFakultasName(res.getName());
+                jurusan.add(result);
+            }
+
+            res.setJurusan(jurusan);
+        }
+
         return res;
+
     }
 
     private FakultasEntity convertReqToEntity(FakultasReq request) {

@@ -1,6 +1,5 @@
 package practice.project.siskoapi.model.response;
 
-import jakarta.persistence.Entity;
 import lombok.*;
 
 @Getter

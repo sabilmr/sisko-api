@@ -5,16 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "t_fakultas")
-public class FakultasEntity {
+@Table(name = "t_jurusan")
+public class JurusanEntity {
     @Id
     @Column(name = "id", length = 36)
     private String id;
@@ -25,17 +23,16 @@ public class FakultasEntity {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "fakultas", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<JurusanEntity> jurusan = new ArrayList<>();
+    @Column(name = "fakultas_id", length = 36, insertable = false, updatable = false)
+    private String fakultasId;
 
-    public FakultasEntity(String id, String code, String name) {
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "fakultas_id")
+    private FakultasEntity fakultas;
+
+    public JurusanEntity(String id, String code, String name) {
         this.id = UUID.randomUUID().toString();
         this.code = code;
         this.name = name;
-    }
-
-    public void addJurusan(JurusanEntity jurusan) {
-        this.jurusan.add(jurusan);
-        jurusan.setFakultas(this);
     }
 }
